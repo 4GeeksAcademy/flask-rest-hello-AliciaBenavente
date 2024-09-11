@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Characters, Planets
 #from models import Person
 
 app = Flask(__name__)
@@ -36,14 +36,70 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route('/user', methods=['GET'])
-def handle_hello():
+# @app.route('/user', methods=['GET'])
+# def handle_hello():
 
+#     response_body = {
+#         "msg": "Hello, this is your GET /user response bbbb"
+#     }
+
+#     return jsonify(response_body), 200
+
+# CHARACTERS
+@app.route('/characters', methods=['GET'])
+def get_characters():
+    characters = Characters.query.all()
+    result = list(map(lambda characters: characters.serialize(), characters))
+
+    return jsonify(result), 200
+
+@app.route('/characters/<int:character_id>', methods=['GET'])
+def get_character(character_id):
+    result = Characters.query.filter_by(id=character_id).first()
+    
+    return jsonify(result.serialize()), 200
+
+# PLANETS
+@app.route('/planets', methods=['GET'])
+def get_planets():
+    planets = Planets.query.all()
+    result = list(map(lambda planets: planets.serialize(), planets))
+
+    return jsonify(result), 200
+
+@app.route('/planets/<int:planet_id>', methods=['GET'])
+def get_planet(planet_id):
+    result = Planets.query.filter_by(id=planet_id).first()
+    
+    return jsonify(result.serialize()), 200
+
+# USERS
+@app.route('/users', methods=['GET'])
+def get_users():
+    users = User.query.all()
+    result = list(map(lambda users: users.serialize(), users))
+
+    return jsonify(result), 200
+
+@app.route('/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    result = User.query.filter_by(id=user_id).first()
+    
+    return jsonify(result.serialize()), 200
+
+@app.route('/users/<int:user_id>/favorites', methods=['GET'])
+def get_favorites(user_id):
+    print(user_id)
+    result = User.query.filter_by(id=user_id).first()
+    print(result)
+    
     response_body = {
-        "msg": "Hello, this is your GET /user response "
+    "msg": "Hello, this is your GET /user response bbbb"
     }
-
     return jsonify(response_body), 200
+
+
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
