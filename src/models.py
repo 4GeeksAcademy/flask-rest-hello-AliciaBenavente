@@ -63,7 +63,7 @@ class Characters(db.Model):
     species = db.Column(db.String(120), nullable=True)
     homeplanet_id = db.Column(db.Integer, db.ForeignKey('planets.id'))
     homeplanet = db.relationship(Planets)
-    gender_id = db.Column(db.String(120), nullable=True)
+    gender = db.Column(db.String(120), nullable=True)
 
     def __repr__(self):
         return '<Character %r>' % self.name
@@ -74,7 +74,7 @@ class Characters(db.Model):
             "name": self.name,
             "species": self.species,
             "homeplanet_id": self.homeplanet_id,
-            "gender": self.gender_id,
+            "gender": self.gender,
         }
 
 

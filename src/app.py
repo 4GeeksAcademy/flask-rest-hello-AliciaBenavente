@@ -87,13 +87,18 @@ def get_user(user_id):
     
     return jsonify(user.serialize()), 200
 
-@app.route('/favorites', methods=['GET'])
+@app.route('/users/favorites', methods=['GET'])
 def get_favorites():
     favorites = Favorites.query.all()
     result = list(map(lambda favorites: favorites.serialize(), favorites))
 
     return jsonify(result), 200
 
+@app.route('/favorite/planet/<int:planets_id>', methods=['POST'])
+def get_favorite(planets_id):
+    favorite = Favorites.query.filter_by(id=planets_id).first()
+
+    return jsonify(favorite.serialize()), 200
 
 
 
