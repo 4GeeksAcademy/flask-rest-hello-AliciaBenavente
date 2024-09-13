@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Characters, Planets
+from models import db, User, Characters, Planets, Favorites
 #from models import Person
 
 app = Flask(__name__)
@@ -55,9 +55,9 @@ def get_characters():
 
 @app.route('/characters/<int:character_id>', methods=['GET'])
 def get_character(character_id):
-    result = Characters.query.filter_by(id=character_id).first()
+    Character = Characters.query.filter_by(id=character_id).first()
     
-    return jsonify(result.serialize()), 200
+    return jsonify(Character.serialize()), 200
 
 # PLANETS
 @app.route('/planets', methods=['GET'])
@@ -69,9 +69,9 @@ def get_planets():
 
 @app.route('/planets/<int:planet_id>', methods=['GET'])
 def get_planet(planet_id):
-    result = Planets.query.filter_by(id=planet_id).first()
+    planet = Planets.query.filter_by(id=planet_id).first()
     
-    return jsonify(result.serialize()), 200
+    return jsonify(planet.serialize()), 200
 
 # USERS
 @app.route('/users', methods=['GET'])
@@ -83,20 +83,16 @@ def get_users():
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
-    result = User.query.filter_by(id=user_id).first()
+    user = User.query.filter_by(id=user_id).first()
     
-    return jsonify(result.serialize()), 200
+    return jsonify(user.serialize()), 200
 
-@app.route('/users/<int:user_id>/favorites', methods=['GET'])
-def get_favorites(user_id):
-    print(user_id)
-    result = User.query.filter_by(id=user_id).first()
-    print(result)
-    
-    response_body = {
-    "msg": "Hello, this is your GET /user response bbbb"
-    }
-    return jsonify(response_body), 200
+@app.route('/favorites', methods=['GET'])
+def get_favorites():
+    favorites = Favorites.query.all()
+    result = list(map(lambda favorites: favorites.serialize(), favorites))
+
+    return jsonify(result), 200
 
 
 
