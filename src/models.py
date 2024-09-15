@@ -3,34 +3,6 @@ from sqlalchemy import Column, ForeignKey, Integer, String
 
 db = SQLAlchemy()
 
-# class User(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     email = db.Column(db.String(120), unique=True, nullable=False)
-#     password = db.Column(db.String(80), unique=False, nullable=False)
-#     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-
-#     def __repr__(self):
-#         return '<User %r>' % self.username
-
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "email": self.email,
-#             # do not serialize the password, its a security breach
-#         }
-
-# class Gender(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     gender = db.Column(db.String(120), nullable=False)
-
-#     def __repr__(self):
-#         return '<Gender %r>' % self.gender
-
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "gender": self.gender,
-#         }
 
 class Planets(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -59,7 +31,7 @@ class Planets(db.Model):
 
 class Characters(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
+    name = db.Column(db.String(120), unique=True, nullable=False)
     species = db.Column(db.String(120), nullable=True)
     homeplanet_id = db.Column(db.Integer, db.ForeignKey('planets.id'))
     homeplanet = db.relationship(Planets)
@@ -82,7 +54,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     creation_date = db.Column(db.String(120), nullable=True)
-    email = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
 
@@ -117,8 +89,37 @@ class Favorites(db.Model):
             "characters_id": self.characters_id,              
         }
 
+class Favorite_Character(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, ForeignKey('user.id'))
+    characters_id = db.Column(db.Integer, db.ForeignKey('characters.id'))
+    description = db.Column(db.String(200), nullable=True)
     
+    def __repr__(self):
+        return '<Favorite_character %r>' % self.name
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "characters_id": self.characters_id,
+            "description" : self.description,           
+        }
+
+class Favorite_Planet(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, ForeignKey('user.id'))
+    planets_id = db.Column(db.Integer, db.ForeignKey('planets.id'))
+    description = db.Column(db.String(200), nullable=True)
+    
+    def __repr__(self):
+        return '<Favorite_planet %r>' % self.name
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "planets_id": self.planets_id,
+            "description" : self.description,           
+        }
 
 # class Login(db.Model):
 #     id = Column(Integer, primary_key=True)

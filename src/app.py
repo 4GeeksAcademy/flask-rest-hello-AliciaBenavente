@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Characters, Planets, Favorites
+from models import db, User, Characters, Planets, Favorites, Favorite_Planet, Favorite_Character
 #from models import Person
 
 app = Flask(__name__)
@@ -87,19 +87,56 @@ def get_user(user_id):
     
     return jsonify(user.serialize()), 200
 
-@app.route('/users/favorites', methods=['GET'])
-def get_favorites():
-    favorites = Favorites.query.all()
-    result = list(map(lambda favorites: favorites.serialize(), favorites))
+@app.route('/users/<int:user_id>/favorites', methods=['GET'])
+def get_user_favorites(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return jsonify("ERROR: This is not the User you are looking for"), 404
+    
+    favorite_characters = Favorite_Character.query.filter_by(user_id=user_id).all()
+    favorite_planets = Favorite_Planet.query.filter_by(user_id=user_id).all()
 
-    return jsonify(result), 200
+    favorite_characters_data = []
+    for favorite_character in favorite_characters:
+        character = Characters.query.filter_by(id=favorite_character.character_id).first()
+        favorite_characters_data.append(character.serialize())
 
-@app.route('/favorite/planet/<int:planets_id>', methods=['POST'])
-def get_favorite(planets_id):
-    favorite = Favorites.query.filter_by(id=planets_id).first()
+    favorite_planets_data = []
+    for favorite_planet in favorite_planets:
+        planet = Planets.query.filter_by(id=favorite_planet.planet_id).first()
+        favorite_planets_data.append(planet.serialize())
 
-    return jsonify(favorite.serialize()), 200
+    return jsonify({
+        "characters": favorite_characters_data,
+        "planets": favorite_planets_data,
+    }), 200
 
+@app.route('/favorite/character', methods=['POST'])
+def add_favorite_character():
+    response_body = {
+        "msg": "Hello, this is your GET /user response bbbb"
+    }
+    print(request)
+    print(request.get_json())
+    print(request.get_json()["name"])
+    body = request.get_json()
+
+    favortite_character = Characters(name = body["name"], species = body["species"], homeplanet_id = "2", gender = body["species"])
+    db.session.add(favortite_character)
+    db.session.commit()
+
+    # request_body = request.get_json()
+    
+    # user = User.query.get(request_body["user_id"])
+    # print(user)
+    # if user is None:
+    #     return jsonify("ERROR: This is not the User you are looking for"), 404
+
+    # character = Characters.query.get(request_body["character_id"])
+    # if character is None:
+    #     return jsonify("ERROR: character_id not exist"), 400
+    # return jsonify(favorite.serialize()), 200
+    return jsonify(response_body), 200
 
 
 # this only runs if `$ python src/app.py` is executed
